@@ -37,7 +37,7 @@ def talk_to_me(update, context):
 
 
 def main():
-    mybot = Updater("6390003041:AAHNllrZHSXCVusVRdjpsvpevFYylBUstb0", use_context=True)
+    mybot = Updater("КлючУбран", use_context=True)
 
     dp = mybot.dispatcher
     dp.add_handler(CommandHandler("start", greet_user))
