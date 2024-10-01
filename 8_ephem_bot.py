@@ -13,21 +13,15 @@
 
 """
 import logging
+from datetime import datetime as dt
+# Не написав as dt, появляется конфликт с библиотекой телеграм бота, у которой тоже есть datetime
 
+import ephem
 from telegram.ext import Updater, CommandHandler, MessageHandler, Filters
 
 logging.basicConfig(format='%(name)s - %(levelname)s - %(message)s',
                     level=logging.INFO,
                     filename='bot.log')
-
-
-PROXY = {
-    'proxy_url': 'socks5://t1.learn.python.ru:1080',
-    'urllib3_proxy_kwargs': {
-        'username': 'learn',
-        'password': 'python'
-    }
-}
 
 
 def greet_user(update, context):
@@ -39,18 +33,28 @@ def greet_user(update, context):
 def talk_to_me(update, context):
     user_text = update.message.text
     print(user_text)
-    update.message.reply_text(text)
+    update.message.reply_text(user_text)
 
 
 def main():
-    mybot = Updater("КЛЮЧ, КОТОРЫЙ НАМ ВЫДАЛ BotFather", request_kwargs=PROXY, use_context=True)
+    mybot = Updater("6390003041:AAHNllrZHSXCVusVRdjpsvpevFYylBUstb0", use_context=True)
 
     dp = mybot.dispatcher
     dp.add_handler(CommandHandler("start", greet_user))
-    dp.add_handler(MessageHandler(Filters.text, talk_to_me))
+    dp.add_handler(CommandHandler("planet", planet_command))
+    # dp.add_handler(MessageHandler(Filters.text, talk_to_me))
 
     mybot.start_polling()
     mybot.idle()
+
+
+def planet_command(update, context):
+    planet_name = context.args[0].capitalize()
+    current_time = dt.now()
+    planet = getattr(ephem, planet_name)(current_time)  # Получаем объект планеты
+    constellation = ephem.constellation(planet)
+    update.message.reply_text(f"Сегодня планета {planet_name} находится в созвездии {constellation[1]}.")
+
 
 
 if __name__ == "__main__":
